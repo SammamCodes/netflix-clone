@@ -8,19 +8,26 @@ import movieRoutes from "./routes/movie.route.js";
 import tvRoutes from "./routes/tv.route.js";
 import searchRoutes from "./routes/search.route.js";
 import { protectRoute } from "./middleware/protectRoute.js";
-
+import path from "path";
 dotenv.config();
 const app = express();
 const PORT = ENV_VARS.PORT;
-
-app.use(express.json());
+const __dirname=path.resolve();
 app.use(cookieParser());
-console.log("MONGO_URI:", process.env.MONGO_URI);
-
+cons
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/movie", protectRoute, movieRoutes);
 app.use("/api/v1/tv", protectRoute, tvRoutes);
 app.use("/api/v1/search", protectRoute, searchRoutes);
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "frontend", "dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+} else {
+  console.log(`Running in ${process.env.NODE_ENV || "development"} mode`);
+}
+
 //app.use("/api/v1/search", protectRoute, searchRoutes);
 app.listen(PORT, () => {
   console.log("Server is running on http://localhost:" + PORT);

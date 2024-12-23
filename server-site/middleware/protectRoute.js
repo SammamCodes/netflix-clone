@@ -25,3 +25,4 @@ next();
         
     }
 }
+export default protectRoute; 
